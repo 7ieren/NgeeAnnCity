@@ -15,7 +15,7 @@ namespace NgeeAnnCity
             int choice = -1;
             Console.WriteLine(" {0,21}", "Ngee Ann City");
 
-            while (choice != 1)
+            while (choice != 0)
             {
                 DisplayMenu();
                 try { choice = Convert.ToInt32(Console.ReadLine()); }
@@ -88,7 +88,7 @@ namespace NgeeAnnCity
                 for (int col = 0; col < NUM_COLUMNS; col++)
                 {
                     Console.Write("+---");
-                }
+                } 
                 Console.WriteLine("+");
             }
 
@@ -134,7 +134,7 @@ namespace NgeeAnnCity
             buildingList.Add("P");
             buildingList.Add("*");
 
-            while (choice != 0)
+            while (choice != 5)
             {
                 DisplayBoard(game.PlayerBoard);
 
@@ -145,8 +145,35 @@ namespace NgeeAnnCity
 
                 Console.WriteLine(" 1. Build a {0}\n 2. Build a {1}", building1, building2);
                 Console.Write(" 3. See Current Score\n 4. Save Game\n 5. Exit to Main Menu\n Enter your choice: ");
-                
-                Console.ReadLine();
+
+                try { choice = Convert.ToInt32(Console.ReadLine()); }
+                catch (FormatException) { Console.WriteLine(" Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1; }
+
+                if (choice == 1)
+                {
+
+                }
+
+                if (choice == 2)
+                {
+
+                }
+
+                if (choice == 3)
+                {
+
+                }
+
+                if (choice == 4)
+                {
+
+                }
+
+                else if (choice > 5)
+                {
+                    Console.WriteLine(" Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1;
+                }
+
 
             }
         }
