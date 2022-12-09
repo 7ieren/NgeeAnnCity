@@ -12,8 +12,12 @@ namespace NgeeAnnCity
         static void Main(string[] args)
         {
 
+            Dictionary<char, int> columnDict = InitColDict();
+           
+
             int choice = -1;
             Console.WriteLine(" {0,21}", "Ngee Ann City");
+
 
             while (choice != 0)
             {
@@ -23,8 +27,9 @@ namespace NgeeAnnCity
 
                 if (choice == 1)
                 {
+                    Console.WriteLine();
                     Game currentGame = InitNewGame();
-                    PlayGame(currentGame);
+                    PlayGame(currentGame, columnDict);
                 }
 
                 if (choice == 2)
@@ -93,6 +98,32 @@ namespace NgeeAnnCity
             }
 
         }
+
+        static Dictionary<char, int> InitColDict()
+        {
+            Dictionary<char, int> columnDict = new Dictionary<char, int>();
+            columnDict.Add('A', 0);
+            columnDict.Add('B', 1);
+            columnDict.Add('C', 2);
+            columnDict.Add('D', 3);
+            columnDict.Add('E', 4);
+            columnDict.Add('F', 5);
+            columnDict.Add('G', 6);
+            columnDict.Add('H', 7);
+            columnDict.Add('I', 8);
+            columnDict.Add('J', 9);
+            columnDict.Add('K', 10);
+            columnDict.Add('L', 11);
+            columnDict.Add('M', 12);
+            columnDict.Add('N', 13);
+            columnDict.Add('O', 14);
+            columnDict.Add('P', 15);
+            columnDict.Add('Q', 16);
+            columnDict.Add('R', 17);
+            columnDict.Add('S', 18);
+            columnDict.Add('T', 19);
+            return columnDict;
+        }
   
         static Game InitNewGame()
         {
@@ -119,43 +150,87 @@ namespace NgeeAnnCity
             };
             Console.Write(" Welcome to Ngee Ann City!\n Enter your name: ");
             string name = Console.ReadLine();
-            Console.WriteLine();
-            Game newGame = new Game() { PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 16 };
+            Console.WriteLine("\n Have fun in Ngee Ann City, " + name + "!\n");
+            Game newGame = new Game() { PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 16, Turn = 0 };
             return newGame;
         }
 
-        static void PlayGame(Game game)
+        static void PlayGame(Game game, Dictionary<char, int> columnDict)
         {
             int choice = -1;
-            List<string> buildingList = new List<string>();
-            buildingList.Add("R");
-            buildingList.Add("I");
-            buildingList.Add("C");
-            buildingList.Add("P");
-            buildingList.Add("*");
+            List<char> buildingList = new List<char>();
+            buildingList.Add('R');
+            buildingList.Add('I');
+            buildingList.Add('C');
+            buildingList.Add('P');
+            buildingList.Add('*');
 
             while (choice != 5)
             {
                 DisplayBoard(game.PlayerBoard);
 
-                DisplayBuildings();
                 Random rnd = new Random();
-                string building1 = buildingList[rnd.Next(0, 4)];
-                string building2 = buildingList[rnd.Next(0, 4)];
+                char building1 = buildingList[rnd.Next(0, 4)];
+                char building2 = buildingList[rnd.Next(0, 4)];
+                bool sameBldng = false;
 
-                Console.WriteLine(" 1. Build a {0}\n 2. Build a {1}", building1, building2);
-                Console.Write(" 3. See Current Score\n 4. Save Game\n 5. Exit to Main Menu\n Enter your choice: ");
+                if (building1 == building2)
+                {
+                    sameBldng = true;
+
+                    while (sameBldng == true)
+                    {
+                        building2 = buildingList[rnd.Next(0, 4)];
+
+                        if (building2 != building1)
+                        {
+                            sameBldng = false;
+                        }
+
+                    }
+                }
+
+                Dictionary<char, string> buildingDict = new Dictionary<char, string>();
+                buildingDict.Add('R', "Residential");
+                buildingDict.Add('I', "Industry");
+                buildingDict.Add('C', "Commercial");
+                buildingDict.Add('P', "Park"); 
+                buildingDict.Add('*', "Road"); 
+
+                try
+                {
+                    if (game.Turn == 0) {
+                        Console.WriteLine("\n You have " + Convert.ToString(game.Coins) + " Coins! \n 1. Build a {0}\n 2. Build a {1}", buildingDict[building1] + " (" + building1 + ")", buildingDict[building2] + " (" + building2 + ")");
+                    }
+
+                    else
+                    {
+                        Console.WriteLine("\n You have " + Convert.ToString(game.Coins) + " Coins remaining! \n 1. Build a {0}\n 2. Build a {1}", buildingDict[building1] + " (" + building1 + ")", buildingDict[building2] + " (" + building2 + ")");
+                    }
+                }
+
+                catch (KeyNotFoundException)
+                {
+                    Console.WriteLine("Key not found!");
+                }
+
+                Console.Write(" 3. See Current Score\n 4. Save Game\n 5. Exit to Main Menu\n\n Enter your choice: ");
 
                 try { choice = Convert.ToInt32(Console.ReadLine()); }
                 catch (FormatException) { Console.WriteLine(" Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1; }
+                Console.WriteLine(); 
 
-                if (choice == 1)
+                if (choice == 1) 
                 {
+                    buildBuilding(building1, game, columnDict);
+                    Console.WriteLine();
 
                 }
 
                 if (choice == 2)
                 {
+                    buildBuilding(building2, game, columnDict);
+                    Console.WriteLine();
 
                 }
 
@@ -174,13 +249,211 @@ namespace NgeeAnnCity
                     Console.WriteLine(" Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1;
                 }
 
-
             }
         }
+        static Game buildBuilding(char bldng, Game game, Dictionary<char, int> columnDict)
+        {
+            int row;
+            int col;
+            char[,] board = game.PlayerBoard;
 
-        static void DisplayBuildings()
-        { 
-            Console.WriteLine(" (R) Residential \n (I) Industry\n (C) Commercial \n (P) Park \n (*) Road");
+            bool success = false;
+
+            Console.Write(" Build a (" + bldng + ") where? ");
+
+            while (!success)
+            {
+                string position = Console.ReadLine();
+                string upperPosition = position[0].ToString().ToUpper();
+                try 
+                {
+                    col = columnDict[Convert.ToChar(upperPosition[0])];
+                    row = Convert.ToInt32(position.Remove(0, 1)) - 1;
+                    if (game.Turn == 0)
+                    {
+                        board[row, col] = bldng;
+                        game.Turn++;
+                        game.Coins--;
+                        return game;
+                    }
+
+                    else
+                    {
+                        bool passCheck = false;
+                        bool checkLeft = true;
+                        bool checkRight = true;
+                        bool checkDown = true;
+                        bool checkUp = true;
+                        bool occupied = false;
+
+                        if (row + 1 == 20)
+                        {
+                            checkDown = false;
+                        }
+
+                        if (row + 1 == 1)
+                        {
+                            checkUp = false;
+                        }
+                        if (col + 1 == 20)
+                        {
+                            checkRight = false;
+                        }
+                        if (col + 1 == 1)
+                        {
+                            checkLeft = false;
+                        }
+
+                        if (row == 19 && col == 0)
+                        {
+                            checkDown = false;
+                            checkLeft = false;
+                        }
+
+                        if (row == 0 && col == 19)
+                        {
+                            checkUp = false;
+                            checkRight = false;
+                        }
+                        if (row == 0 && col == 0)
+                        {
+                            checkUp = false;
+                            checkLeft = false;
+                        }
+
+                        if (checkLeft)
+                        {
+                            if (board[row, col - 1] != ' ')
+                            {
+                                passCheck = true;
+
+                                if (passCheck == true)
+                                {
+                                    if (board[row, col] == ' ')
+                                    {
+                                        board[row, col] = bldng;
+                                        success = true;
+                                    }
+                                    else
+                                    {
+                                        occupied = true;
+                                    }
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine(" You must build next to an existing building.");
+                                }
+                            }
+                        }
+
+                        if (checkRight)
+                        {
+                            if (board[row, col + 1] != ' ')
+                            {
+                                passCheck = true;
+                                if (passCheck == true)
+                                {
+                                    if (board[row, col] == ' ')
+                                    {
+                                        board[row, col] = bldng;
+                                        success = true;
+                                    }
+                                    else
+                                    {
+                                        occupied = true;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine(" You must build next to an existing building.");
+                                }
+                            }
+                        }
+
+                        if (checkUp)
+                        {
+                            if (board[row - 1, col] != ' ')
+                            {
+                                passCheck = true;
+
+                                if (passCheck == true)
+                                {
+                                    if (board[row, col] == ' ')
+                                    {
+                                        board[row, col] = bldng;
+                                        success = true;
+                                    }
+
+                                    else
+                                    {
+                                        occupied = true;
+                                    }
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine(" You must build next to an existing building.");
+                                }
+                            }
+                        }
+
+                        if (checkDown)
+                        {
+                            if (board[row + 1, col] != ' ')
+                            {
+                                passCheck = true;
+                                if (passCheck == true)
+                                {
+                                    if (board[row, col] == ' ')
+                                    {
+                                        board[row, col] = bldng;
+                                        success = true;
+                                    }
+                                    else
+                                    {
+                                        occupied = true;
+                                    }
+                                }
+
+                                else
+                                {
+                                    Console.WriteLine(" You must build next to an existing building.");
+                                }
+                            }
+                        }
+
+                        if (occupied)
+                        {
+                            Console.Write(" This plot is already occupied. Try again: ");
+
+                        }
+
+                        if (!passCheck)
+                        {
+                            Console.Write(" You must build next to an existing building. Try again: ");
+
+                        }
+
+                        if (success)
+                        {
+                            game.Turn++;
+                            game.Coins--;
+                        }
+
+                    }
+                }
+
+                catch
+                {
+                    Console.Write(" Location does not exist! An example is 'A1'. Try again: ");
+                }
+                
+                
+            }
+
+            return game;
+            
         }
 
         static void LoadSavedGame()
@@ -192,6 +465,7 @@ namespace NgeeAnnCity
         {
 
         }
+
 
     }
 }

@@ -15,5 +15,7 @@ namespace NgeeAnnCity
         public char[,] PlayerBoard { get; set; }
         public int Coins { get; set; }
 
+        public int Turn { get; set; }
+
     }
 }
