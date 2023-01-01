@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Data;
+using System.Collections.Specialized;
 
 namespace NgeeAnnCity
 {
@@ -236,7 +239,7 @@ namespace NgeeAnnCity
 
                 if (choice == 3)
                 {
-
+                    seeCurrentScore(game);
                 }
 
                 if (choice == 4)
@@ -454,6 +457,80 @@ namespace NgeeAnnCity
 
             return game;
             
+        }
+
+        static void seeCurrentScore(Game game)
+        {
+            char[,] board = game.PlayerBoard;
+            int ICount = 0;
+            int pts = 0;
+            int HSEC = 0;
+            List<int> HSE = new List<int>();
+
+            foreach (int row in Enumerable.Range(0, board.GetLength(0)))
+            {
+                foreach (int col in Enumerable.Range(0, board.GetLength(1)))
+                {
+                    char c = board[row, col];
+                    List<char> adjacent = new List<char>();
+                    
+                    if (col != 19)
+                    {
+                        adjacent.Add(board[row, col + 1]);
+                    }
+                    if (col != 0)
+                    {
+                        adjacent.Add(board[row, col - 1]);
+                    }
+                    if (row != 19)
+                    {
+                        adjacent.Add(board[row + 1, col]);
+                    }
+                    if (row != 0)
+                    {
+                        adjacent.Add(board[row - 1, col]);
+                    }                
+
+                    if (c == ' ')
+                    {
+                        continue;
+                    }
+                    else if (c == 'R')
+                    {
+                        if (adjacent.Contains('I')){
+                            HSE.Add(1);
+                            HSEC += 1;
+                        }
+                        else
+                        {
+                            pts = 0;
+                            HSEC = 0;
+
+                            for (int i = 0; i < adjacent.Count; i++)
+                            {
+                                if (adjacent[i] == 'R' || adjacent[i] == 'C')
+                                {
+                                    pts += 1;
+                                    HSEC += 1;
+                                }
+                                else if (adjacent[i] == 'P')
+                                {
+                                    pts += 2;
+                                    HSEC += 1;
+                                }
+                            }
+                            HSE.Add(pts);
+                        }
+                    }
+                   
+                }
+            }
+            for (int i = 0; i < HSE.Count; i++)
+            {            
+                game.PlayerScore += HSE[i];
+                Console.Write(HSE[i] + " ");
+            }
+            Console.WriteLine("Your current score: " + game.PlayerScore);
         }
 
         static void LoadSavedGame()
