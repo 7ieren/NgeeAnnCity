@@ -7,6 +7,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Data;
 using System.Collections.Specialized;
+using System.Security.Permissions;
+using System.Security;
 
 namespace NgeeAnnCity
 {
@@ -461,11 +463,20 @@ namespace NgeeAnnCity
 
         static void seeCurrentScore(Game game)
         {
-            char[,] board = game.PlayerBoard;
-            int ICount = 0;
+            char[,] board = game.PlayerBoard;        
             int pts = 0;
-            int HSEC = 0;
-            List<int> HSE = new List<int>();
+            int RCount = 0;
+            int ICount = 0;
+            int CCount = 0;
+            int PCount = 0;
+            int RPts = 0;
+            int IPts = 0;
+            int CPts = 0;
+            int PPts = 0;
+            List<int> R = new List<int>();
+            List<int> I = new List<int>();
+            List<int> C = new List<int>();
+            List<int> P = new List<int>();
 
             foreach (int row in Enumerable.Range(0, board.GetLength(0)))
             {
@@ -492,45 +503,145 @@ namespace NgeeAnnCity
                     }                
 
                     if (c == ' ')
-                    {
+                    {                      
                         continue;
                     }
+
+                    // if current building is R
                     else if (c == 'R')
-                    {
+                    {                     
                         if (adjacent.Contains('I')){
-                            HSE.Add(1);
-                            HSEC += 1;
+                            R.Add(1);
+                            RCount += 1;
                         }
                         else
                         {
                             pts = 0;
-                            HSEC = 0;
+                            RCount = 0;
 
                             for (int i = 0; i < adjacent.Count; i++)
                             {
                                 if (adjacent[i] == 'R' || adjacent[i] == 'C')
-                                {
+                                {                                  
                                     pts += 1;
-                                    HSEC += 1;
+                                    RCount += 1;
                                 }
                                 else if (adjacent[i] == 'P')
-                                {
+                                {                              
                                     pts += 2;
-                                    HSEC += 1;
+                                    RCount += 1;
                                 }
-                            }
-                            HSE.Add(pts);
+                            }                        
+                            R.Add(pts);
                         }
                     }
-                   
+
+                    // if current buidling is I
+                    else if (c == 'I')
+                    {
+                        ICount += 1;
+                        I.Add(1);
+                    }
+
+                    // if current building is C
+                    else if (c == 'C')
+                    {
+                        List<char> CAdjacent = new List<char>();
+                        for (int i = 0; i < adjacent.Count; i++)
+                        {
+                            if (adjacent[i] == 'C')
+                            {
+                                CAdjacent.Add('C');
+                                CCount += 1;
+                            }
+                        }
+                        C.Add(CAdjacent.Count);                
+                    } 
+                    
+                    // if current building is P
+                    else if (c == 'P')
+                    {
+                        List<char> PAdjacent = new List<char>();
+                        for (int i = 0; i < adjacent.Count; i++)
+                        {
+                            if (adjacent[i] == 'P')
+                            {
+                                PAdjacent.Add('P');
+                                PCount += 1;
+                            }
+                        }
+                        P.Add(PAdjacent.Count);
+                    }
+
+                    // if current building is R (to be implemented)
+                    
                 }
             }
-            for (int i = 0; i < HSE.Count; i++)
-            {            
-                game.PlayerScore += HSE[i];
-                Console.Write(HSE[i] + " ");
+
+            // R Points calculation
+            if (RCount == 0)
+            {
+                Console.WriteLine('0');
             }
-            Console.WriteLine("Your current score: " + game.PlayerScore);
+            else if (RCount != 0)
+            {
+                for (int i = 0; i < R.Count; i++)
+                {
+                    Console.WriteLine("R: " + R[i] + " "); // test                
+                    RPts += R[i];
+                    game.PlayerScore += RPts;
+                }
+            }
+
+            // I Points calculation
+            if (ICount == 0)
+            {
+                Console.WriteLine('0');
+            }
+            else if (ICount != 0)
+            {
+                for (int i = 0; i < I.Count; i++)
+                {
+                    Console.WriteLine("I: " + I[i] + " "); // test
+                    IPts += I[i];
+                    game.PlayerScore += IPts;
+
+                }
+            }
+
+            // C Points calculation
+            if (CCount == 0)
+            {
+                Console.WriteLine('0');
+            }
+            else if (CCount != 0)
+            {
+                for (int i = 0; i < C.Count; i++)
+                {
+                    Console.WriteLine("C: " + C[i] + " "); // test
+                    CPts += C[i];
+                    game.PlayerScore += CPts;
+                }
+            }
+
+            // P Points calculation
+            if (PCount == 0)
+            {
+                Console.WriteLine("0");
+            }
+            else if (PCount != 0)
+            {
+                for (int i = 0; i < P.Count; i++)
+                {
+                    Console.WriteLine("P: " + P[i] + " "); // test
+                    PPts += P[i];
+                    game.PlayerScore += PPts;
+                }
+            }
+
+            // Overall current score
+            Console.WriteLine("Your current score: " + "R- " + RPts + " | " + "I- " + 
+                IPts + " | " + "C- " + CPts + " | " + "P- " + PPts);
         }
 
         static void LoadSavedGame()
