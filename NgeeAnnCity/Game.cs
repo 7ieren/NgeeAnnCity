@@ -8,6 +8,7 @@ namespace NgeeAnnCity
 {
     class Game
     {
+        public int MaxRow { get; set; }
         public string PlayerName { get; set; }
 
         public int PlayerScore { get; set; }

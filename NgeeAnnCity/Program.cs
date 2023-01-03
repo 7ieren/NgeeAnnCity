@@ -72,12 +72,23 @@ namespace NgeeAnnCity
 
         }
 
-        static void DisplayBoard(char[,] board)
+        static void DisplayBoard(char[,] board, Game g)
         {
-            int NUM_ROWS = 20;
-            int NUM_COLUMNS = 20;
-            Console.WriteLine("     A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T");
-            Console.WriteLine("   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+");
+            int NUM_ROWS = g.MaxRow;
+            int NUM_COLUMNS = g.MaxRow;
+            
+            if (NUM_ROWS == 10)
+            {
+                Console.WriteLine("     A   B   C   D   E   F   G   H   I   J  ");
+                Console.WriteLine("   +---+---+---+---+---+---+---+---+---+---+");
+            }
+            
+            if (NUM_ROWS == 20)
+            {
+                Console.WriteLine("     A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T");
+                Console.WriteLine("   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+");
+            }
+
             for (int row = 0; row < NUM_ROWS; row++)
             {
                 if (row < 9)
@@ -132,7 +143,45 @@ namespace NgeeAnnCity
   
         static Game InitNewGame()
         {
-            char[,] Board = { { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' },
+            
+            Console.Write(" Welcome to Ngee Ann City!\n Enter your name: ");
+
+            string name = Console.ReadLine();
+
+            Console.Write(" Choose your grid size: \n 1. 10x10 \n 2. 20x20 \n 0. Exit \n Your Choice: ");
+            int max_row = 0;
+            int choice = -1;
+
+            while (choice != 0)
+            {
+                try { choice = Convert.ToInt32(Console.ReadLine()); }
+                catch (FormatException) { Console.Write(" Only integers from 1 - 2 are allowed. Try Again.\n Your Choice: "); choice = -1; }
+
+                if (choice == 1)
+                {
+                    max_row = 10;
+                    char[,] Board = { { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}, 
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}
+                    };
+
+                    Console.WriteLine("\n Have fun in Ngee Ann City, " + name + "!\n");
+                    Game newGame = new Game() { MaxRow = max_row, PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 8, Turn = 0 };
+                    return newGame;
+
+                }
+
+                if (choice == 2)
+                {
+                    max_row = 20;
+                    char[,] Board = { { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' },
             { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' },
             { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' },
             { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' },
@@ -153,11 +202,20 @@ namespace NgeeAnnCity
             { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' },
             { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' }
             };
-            Console.Write(" Welcome to Ngee Ann City!\n Enter your name: ");
-            string name = Console.ReadLine();
-            Console.WriteLine("\n Have fun in Ngee Ann City, " + name + "!\n");
-            Game newGame = new Game() { PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 16, Turn = 0 };
-            return newGame;
+                    Console.WriteLine("\n Have fun in Ngee Ann City, " + name + "!\n");
+                    Game newGame = new Game() { MaxRow = max_row, PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 16, Turn = 0 };
+                    return newGame;
+                }
+
+
+                else if (choice > 2)
+                {
+                    Console.Write(" Only integers from 1 - 2 are allowed. Try Again.\n Your Choice: ");
+                }
+            }
+
+            Game Game = new Game();
+            return Game;
         }
 
         static void PlayGame(Game game, Dictionary<char, int> columnDict)
@@ -172,11 +230,18 @@ namespace NgeeAnnCity
 
             while (choice != 5)
             {
-                DisplayBoard(game.PlayerBoard);
+
+                if (game.Coins == 0)
+                {
+                    EndGame(game);
+                    break;
+                }
+
+                DisplayBoard(game.PlayerBoard, game);
 
                 Random rnd = new Random();
-                char building1 = buildingList[rnd.Next(0, 4)];
-                char building2 = buildingList[rnd.Next(0, 4)];
+                char building1 = buildingList[rnd.Next(0, 5)];
+                char building2 = buildingList[rnd.Next(0, 5)];
                 bool sameBldng = false;
 
                 if (building1 == building2)
@@ -219,7 +284,7 @@ namespace NgeeAnnCity
                     Console.WriteLine("Key not found!");
                 }
 
-                Console.Write(" 3. See Current Score\n 4. Save Game\n 5. Exit to Main Menu\n\n Enter your choice: ");
+                Console.Write(" 3. See Current Score\n 4. Save Game\n 5. Exit to Main Menu\n 0. Need Help? \n\n Enter your choice: ");
 
                 try { choice = Convert.ToInt32(Console.ReadLine()); }
                 catch (FormatException) { Console.WriteLine(" Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1; }
@@ -229,7 +294,6 @@ namespace NgeeAnnCity
                 {
                     buildBuilding(building1, game, columnDict);
                     Console.WriteLine();
-
                 }
 
                 if (choice == 2)
@@ -247,6 +311,11 @@ namespace NgeeAnnCity
                 if (choice == 4)
                 {
 
+                }
+
+                if (choice == 0)
+                {
+                    HelpInfo();
                 }
 
                 else if (choice > 5)
@@ -291,7 +360,7 @@ namespace NgeeAnnCity
                         bool checkUp = true;
                         bool occupied = false;
 
-                        if (row + 1 == 20)
+                        if (row + 1 == game.MaxRow)
                         {
                             checkDown = false;
                         }
@@ -300,7 +369,7 @@ namespace NgeeAnnCity
                         {
                             checkUp = false;
                         }
-                        if (col + 1 == 20)
+                        if (col + 1 == game.MaxRow)
                         {
                             checkRight = false;
                         }
@@ -309,13 +378,13 @@ namespace NgeeAnnCity
                             checkLeft = false;
                         }
 
-                        if (row == 19 && col == 0)
+                        if (row + 1 == game.MaxRow && col == 0)
                         {
                             checkDown = false;
                             checkLeft = false;
                         }
 
-                        if (row == 0 && col == 19)
+                        if (row == 0 && col + 1 == game.MaxRow)
                         {
                             checkUp = false;
                             checkRight = false;
@@ -461,10 +530,11 @@ namespace NgeeAnnCity
             
         }
 
-        static void seeCurrentScore(Game game)
+        static int seeCurrentScore(Game game)
         {
             char[,] board = game.PlayerBoard;        
             int pts = 0;
+            int total = 0;
             int RCount = 0;
             int ICount = 0;
             int CCount = 0;
@@ -485,7 +555,7 @@ namespace NgeeAnnCity
                     char c = board[row, col];
                     List<char> adjacent = new List<char>();
                     
-                    if (col != 19)
+                    if (col + 1 != game.MaxRow)
                     {
                         adjacent.Add(board[row, col + 1]);
                     }
@@ -493,7 +563,7 @@ namespace NgeeAnnCity
                     {
                         adjacent.Add(board[row, col - 1]);
                     }
-                    if (row != 19)
+                    if (row + 1 != game.MaxRow)
                     {
                         adjacent.Add(board[row + 1, col]);
                     }
@@ -587,9 +657,9 @@ namespace NgeeAnnCity
             {
                 for (int i = 0; i < R.Count; i++)
                 {
-                    Console.WriteLine("R: " + R[i] + " "); // test                
+                    //Console.WriteLine("R: " + R[i] + " "); // test                
                     RPts += R[i];
-                    game.PlayerScore += RPts;
+                    total += RPts;
                 }
             }
 
@@ -602,9 +672,9 @@ namespace NgeeAnnCity
             {
                 for (int i = 0; i < I.Count; i++)
                 {
-                    Console.WriteLine("I: " + I[i] + " "); // test
+                    //Console.WriteLine("I: " + I[i] + " "); // test
                     IPts += I[i];
-                    game.PlayerScore += IPts;
+                    total += IPts;
 
                 }
             }
@@ -618,9 +688,9 @@ namespace NgeeAnnCity
             {
                 for (int i = 0; i < C.Count; i++)
                 {
-                    Console.WriteLine("C: " + C[i] + " "); // test
+                    //Console.WriteLine("C: " + C[i] + " "); // test
                     CPts += C[i];
-                    game.PlayerScore += CPts;
+                    total += CPts;
                 }
             }
 
@@ -633,15 +703,19 @@ namespace NgeeAnnCity
             {
                 for (int i = 0; i < P.Count; i++)
                 {
-                    Console.WriteLine("P: " + P[i] + " "); // test
+                    //Console.WriteLine("P: " + P[i] + " "); // test
                     PPts += P[i];
-                    game.PlayerScore += PPts;
+                    total += PPts;
                 }
             }
 
+            // Update Player Score
+            game.PlayerScore = total;
+
+            Console.WriteLine(" Total Points: " + total);
+            return total;
             // Overall current score
-            Console.WriteLine("Your current score: " + "R- " + RPts + " | " + "I- " + 
-                IPts + " | " + "C- " + CPts + " | " + "P- " + PPts);
+            
         }
 
         static void LoadSavedGame()
@@ -651,12 +725,25 @@ namespace NgeeAnnCity
 
         static void DisplayHighScores()
         {
+   
+        }
 
+        static void HelpInfo()
+        {
+            
+            Console.WriteLine(" Building Scores: \n Industry (I) - Scores 1 point per industry in the city. Each industry generates 1 coin per residential building adjacent to it.");
+            Console.WriteLine(" Commercial (C): Scores 1 point per commercial adjacent to it. Each commercial generates 1 coin \n Residential (R): If it is next to an industry (I), then it scores 1 point only. Otherwise, it scores 1 point for each adjacent residential (R) or commercial (C), and 2 points for each adjacent park (O).\n Park (O): Scores 1 point per park adjacent to it. \n Road (*): Scores 1 point per connected road (*) in the same row.\n ");
         }
 
         static bool SaveGame(Game game)
         {
             return false;
+        }
+
+        static void EndGame(Game game)
+        {
+            Console.WriteLine(" You have finished your coins! \n This is your final board: \n Your final score: " + seeCurrentScore(game));
+            DisplayBoard(game.PlayerBoard, game);
         }
 
     }
