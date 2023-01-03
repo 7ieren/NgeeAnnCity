@@ -654,6 +654,10 @@ namespace NgeeAnnCity
 
         }
 
+        static bool SaveGame(Game game)
+        {
+            return false;
+        }
 
     }
 }
