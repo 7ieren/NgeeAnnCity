@@ -764,6 +764,9 @@ namespace NgeeAnnCity
         static void LoadSavedGame()
         {
 
+            string[] lines = System.IO.File.ReadAllLines("testing.txt");
+            Console.WriteLine(lines[3]);
+ 
         }
 
         static void DisplayHighScores()
