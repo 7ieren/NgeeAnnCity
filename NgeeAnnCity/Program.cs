@@ -535,26 +535,59 @@ namespace NgeeAnnCity
             char[,] board = game.PlayerBoard;        
             int pts = 0;
             int total = 0;
+
             int RCount = 0;
             int ICount = 0;
             int CCount = 0;
             int PCount = 0;
+            int HWYCount = 0;
+
             int RPts = 0;
             int IPts = 0;
             int CPts = 0;
             int PPts = 0;
+            int HWYPts = 0;
+
             List<int> R = new List<int>();
             List<int> I = new List<int>();
             List<int> C = new List<int>();
             List<int> P = new List<int>();
+            List<int> HWY = new List<int>();
 
             foreach (int row in Enumerable.Range(0, board.GetLength(0)))
-            {
+            {                 
                 foreach (int col in Enumerable.Range(0, board.GetLength(1)))
                 {
                     char c = board[row, col];
                     List<char> adjacent = new List<char>();
-                    
+
+                    // if current building is *
+                    int count = 0;
+                    if (c == '*')
+                    {
+                        count += 1;
+                        HWYCount += 1;
+                    }
+                    else
+                    {
+                        if (count != 0)
+                        {
+                            for (int i = 0; i < count; i++)
+                            {
+                                HWY.Add(count);
+                            }
+                            count = 0;
+                        }
+                    }
+                    if (count != 0)
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            HWY.Add(count);
+                        }
+                        count = 0;
+                    }
+                                                     
                     if (col + 1 != game.MaxRow)
                     {
                         adjacent.Add(board[row, col + 1]);
@@ -641,13 +674,10 @@ namespace NgeeAnnCity
                             }
                         }
                         P.Add(PAdjacent.Count);
-                    }
-
-                    // if current building is R (to be implemented)
-                    
+                    }                  
                 }
             }
-
+        
             // R Points calculation
             if (RCount == 0)
             {
@@ -656,8 +686,7 @@ namespace NgeeAnnCity
             else if (RCount != 0)
             {
                 for (int i = 0; i < R.Count; i++)
-                {
-                    //Console.WriteLine("R: " + R[i] + " "); // test                
+                {               
                     RPts += R[i];
                     total += RPts;
                 }
@@ -671,8 +700,7 @@ namespace NgeeAnnCity
             else if (ICount != 0)
             {
                 for (int i = 0; i < I.Count; i++)
-                {
-                    //Console.WriteLine("I: " + I[i] + " "); // test
+                {                 
                     IPts += I[i];
                     total += IPts;
 
@@ -687,8 +715,7 @@ namespace NgeeAnnCity
             else if (CCount != 0)
             {
                 for (int i = 0; i < C.Count; i++)
-                {
-                    //Console.WriteLine("C: " + C[i] + " "); // test
+                {                  
                     CPts += C[i];
                     total += CPts;
                 }
@@ -702,20 +729,36 @@ namespace NgeeAnnCity
             else if (PCount != 0)
             {
                 for (int i = 0; i < P.Count; i++)
-                {
-                    //Console.WriteLine("P: " + P[i] + " "); // test
+                {                 
                     PPts += P[i];
                     total += PPts;
                 }
             }
 
-            // Update Player Score
+            // * Points Calculation
+            if (HWYCount == 0)
+            {
+                Console.WriteLine('0');
+            }
+            else if (HWYCount != 0)
+            {
+                for (int i = 0; i < HWY.Count; i++)
+                {                  
+                    HWYPts += HWY[i];
+                    total += HWYPts;
+                }
+            }
+
+            // Display score for each building
+            Console.WriteLine("\nYour current points: " + "Residential (R) - " + RPts + " | " + "Industry (I) - " +
+                IPts + " | " + "Commercial (C) - " + CPts + " | " + "Park (P) - " + PPts + " | " + "Road (*) - " + HWYPts);
+            Console.WriteLine(" ");
+
+            // Update overall Player Score
             game.PlayerScore = total;
 
             Console.WriteLine(" Total Points: " + total);
-            return total;
-            // Overall current score
-            
+            return total;             
         }
 
         static void LoadSavedGame()
@@ -735,9 +778,15 @@ namespace NgeeAnnCity
             Console.WriteLine(" Commercial (C): Scores 1 point per commercial adjacent to it. Each commercial generates 1 coin \n Residential (R): If it is next to an industry (I), then it scores 1 point only. Otherwise, it scores 1 point for each adjacent residential (R) or commercial (C), and 2 points for each adjacent park (O).\n Park (O): Scores 1 point per park adjacent to it. \n Road (*): Scores 1 point per connected road (*) in the same row.\n ");
         }
 
-        static bool SaveGame(Game game)
+        static void SaveGame(Game game)
         {
-            return false;
+            char[,] board = game.PlayerBoard;
+            char s = ' ';
+
+            string turn = $"Turn - {game.Turn}\n";
+            File.WriteAllText("D:\\VS2022 Stash\\NgeeAnnCity\\NgeeAnnCity\\testing.txt", turn);
+
+            Console.WriteLine("Game saved!\n");
         }
 
         static void EndGame(Game game)
