@@ -9,6 +9,7 @@ using System.Data;
 using System.Collections.Specialized;
 using System.Security.Permissions;
 using System.Security;
+using System.Diagnostics.Eventing.Reader;
 
 namespace NgeeAnnCity
 {
@@ -310,7 +311,7 @@ namespace NgeeAnnCity
 
                 if (choice == 4)
                 {
-
+                    SaveGame(game);
                 }
 
                 if (choice == 0)
@@ -553,7 +554,7 @@ namespace NgeeAnnCity
             List<int> C = new List<int>();
             List<int> P = new List<int>();
             List<int> HWY = new List<int>();
-
+            
             foreach (int row in Enumerable.Range(0, board.GetLength(0)))
             {                 
                 foreach (int col in Enumerable.Range(0, board.GetLength(1)))
@@ -764,9 +765,8 @@ namespace NgeeAnnCity
         static void LoadSavedGame()
         {
 
-            string[] lines = System.IO.File.ReadAllLines("testing.txt");
-            Console.WriteLine(lines[3]);
- 
+            string[] lines = System.IO.File.ReadAllLines("D:\\VS2022 Stash\\NgeeAnnCity\\NgeeAnnCity\\testing.txt");          
+            Console.WriteLine(lines[0]);
         }
 
         static void DisplayHighScores()
@@ -784,11 +784,20 @@ namespace NgeeAnnCity
         static void SaveGame(Game game)
         {
             char[,] board = game.PlayerBoard;
-            char s = ' ';
-
-            string turn = $"Turn - {game.Turn}\n";
-            File.WriteAllText("D:\\VS2022 Stash\\NgeeAnnCity\\NgeeAnnCity\\testing.txt", turn);
-
+            using (StreamWriter sw = new StreamWriter("D:\\VS2022 Stash\\NgeeAnnCity\\NgeeAnnCity\\testing.txt", false))
+            {
+                for (int row = 0; row < game.MaxRow; row++)
+                {
+                    for (int col = 0; col < game.MaxRow; col++)
+                    {
+                        sw.Write(board[row, col] + ",");
+                    }
+                    sw.WriteLine();
+                }
+                sw.WriteLine(game.MaxRow);
+                sw.WriteLine(game.PlayerName);
+                sw.WriteLine(game.Coins);
+            }    
             Console.WriteLine("Game saved!\n");
         }
 
