@@ -173,7 +173,7 @@ namespace NgeeAnnCity
                     };
 
                     Console.WriteLine("\n Have fun in Ngee Ann City, " + name + "!\n");
-                    Game newGame = new Game() { MaxRow = max_row, PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 8, Turn = 0 };
+                    Game newGame = new Game() { MaxRow = max_row, PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 8, Turn = 1 };
                     return newGame;
 
                 }
@@ -203,7 +203,7 @@ namespace NgeeAnnCity
             { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' }
             };
                     Console.WriteLine("\n Have fun in Ngee Ann City, " + name + "!\n");
-                    Game newGame = new Game() { MaxRow = max_row, PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 16, Turn = 0 };
+                    Game newGame = new Game() { MaxRow = max_row, PlayerName = name, PlayerScore = 0, PlayerBoard = Board, Coins = 16, Turn = 1 };
                     return newGame;
                 }
 
@@ -237,6 +237,7 @@ namespace NgeeAnnCity
                     break;
                 }
 
+                int Score = getCurrentScore(game);
                 DisplayBoard(game.PlayerBoard, game);
 
                 Random rnd = new Random();
@@ -269,14 +270,8 @@ namespace NgeeAnnCity
 
                 try
                 {
-                    if (game.Turn == 0) {
-                        Console.WriteLine("\n You have " + Convert.ToString(game.Coins) + " Coins! \n 1. Build a {0}\n 2. Build a {1}", buildingDict[building1] + " (" + building1 + ")", buildingDict[building2] + " (" + building2 + ")");
-                    }
+                    Console.WriteLine("\n   Turn: " + Convert.ToString(game.Turn) + "   Coins: " + Convert.ToString(game.Coins) + "    Points: " + Score + " \n\n   Options\n   --------------\n   1. Build a {0}\n   2. Build a {1}", buildingDict[building1] + " (" + building1 + ")", buildingDict[building2] + " (" + building2 + ")");
 
-                    else
-                    {
-                        Console.WriteLine("\n You have " + Convert.ToString(game.Coins) + " Coins remaining! \n 1. Build a {0}\n 2. Build a {1}", buildingDict[building1] + " (" + building1 + ")", buildingDict[building2] + " (" + building2 + ")");
-                    }
                 }
 
                 catch (KeyNotFoundException)
@@ -284,10 +279,10 @@ namespace NgeeAnnCity
                     Console.WriteLine("Key not found!");
                 }
 
-                Console.Write(" 3. See Current Score\n 4. Save Game\n 5. Exit to Main Menu\n 0. Need Help? \n\n Enter your choice: ");
+                Console.Write("   3. See Current Score\n   4. Save Game\n   5. Exit to Main Menu\n   0. Need Help? \n\n   Enter your choice: ");
 
                 try { choice = Convert.ToInt32(Console.ReadLine()); }
-                catch (FormatException) { Console.WriteLine(" Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1; }
+                catch (FormatException) { Console.WriteLine("   Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1; }
                 Console.WriteLine(); 
 
                 if (choice == 1) 
@@ -305,7 +300,7 @@ namespace NgeeAnnCity
 
                 if (choice == 3)
                 {
-                    seeCurrentScore(game);
+                    printCurrentScore(game);
                 }
 
                 if (choice == 4)
@@ -320,7 +315,7 @@ namespace NgeeAnnCity
 
                 else if (choice > 5)
                 {
-                    Console.WriteLine(" Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1;
+                    Console.WriteLine("   Only integers from 1 - 5 are allowed. Try Again.\n"); choice = -1;
                 }
 
             }
@@ -333,7 +328,7 @@ namespace NgeeAnnCity
 
             bool success = false;
 
-            Console.Write(" Build a (" + bldng + ") where? ");
+            Console.Write("   Build a (" + bldng + ") where? ");
 
             while (!success)
             {
@@ -343,7 +338,7 @@ namespace NgeeAnnCity
                 {
                     col = columnDict[Convert.ToChar(upperPosition[0])];
                     row = Convert.ToInt32(position.Remove(0, 1)) - 1;
-                    if (game.Turn == 0)
+                    if (game.Turn == 1)
                     {
                         board[row, col] = bldng;
                         game.Turn++;
@@ -416,7 +411,7 @@ namespace NgeeAnnCity
 
                                 else
                                 {
-                                    Console.WriteLine(" You must build next to an existing building.");
+                                    Console.WriteLine("   You must build next to an existing building.");
                                 }
                             }
                         }
@@ -440,7 +435,7 @@ namespace NgeeAnnCity
                                 }
                                 else
                                 {
-                                    Console.WriteLine(" You must build next to an existing building.");
+                                    Console.WriteLine("   You must build next to an existing building.");
                                 }
                             }
                         }
@@ -467,7 +462,7 @@ namespace NgeeAnnCity
 
                                 else
                                 {
-                                    Console.WriteLine(" You must build next to an existing building.");
+                                    Console.WriteLine("   You must build next to an existing building.");
                                 }
                             }
                         }
@@ -492,20 +487,20 @@ namespace NgeeAnnCity
 
                                 else
                                 {
-                                    Console.WriteLine(" You must build next to an existing building.");
+                                    Console.WriteLine("   You must build next to an existing building.");
                                 }
                             }
                         }
 
                         if (occupied)
                         {
-                            Console.Write(" This plot is already occupied. Try again: ");
+                            Console.Write("   This plot is already occupied. Try again: ");
 
                         }
 
                         if (!passCheck)
                         {
-                            Console.Write(" You must build next to an existing building. Try again: ");
+                            Console.Write("   You must build next to an existing building. Try again: ");
 
                         }
 
@@ -520,7 +515,7 @@ namespace NgeeAnnCity
 
                 catch
                 {
-                    Console.Write(" Location does not exist! An example is 'A1'. Try again: ");
+                    Console.Write("   Location does not exist! An example is 'A1'. Try again: ");
                 }
                 
                 
@@ -530,8 +525,231 @@ namespace NgeeAnnCity
             
         }
 
-        static int seeCurrentScore(Game game)
+        static int getCurrentScore(Game game)
         {
+            {
+                char[,] board = game.PlayerBoard;
+                int pts = 0;
+                int total = 0;
+
+                int RCount = 0;
+                int ICount = 0;
+                int CCount = 0;
+                int PCount = 0;
+                int HWYCount = 0;
+
+                int RPts = 0;
+                int IPts = 0;
+                int CPts = 0;
+                int PPts = 0;
+                int HWYPts = 0;
+
+                List<int> R = new List<int>();
+                List<int> I = new List<int>();
+                List<int> C = new List<int>();
+                List<int> P = new List<int>();
+                List<int> HWY = new List<int>();
+
+                foreach (int row in Enumerable.Range(0, board.GetLength(0)))
+                {
+                    foreach (int col in Enumerable.Range(0, board.GetLength(1)))
+                    {
+                        char c = board[row, col];
+                        List<char> adjacent = new List<char>();
+
+                        // if current building is *
+                        int count = 0;
+                        if (c == '*')
+                        {
+                            count += 1;
+                            HWYCount += 1;
+                        }
+                        else
+                        {
+                            if (count != 0)
+                            {
+                                for (int i = 0; i < count; i++)
+                                {
+                                    HWY.Add(count);
+                                }
+                                count = 0;
+                            }
+                        }
+                        if (count != 0)
+                        {
+                            for (int i = 0; i < count; i++)
+                            {
+                                HWY.Add(count);
+                            }
+                            count = 0;
+                        }
+
+                        if (col + 1 != game.MaxRow)
+                        {
+                            adjacent.Add(board[row, col + 1]);
+                        }
+                        if (col != 0)
+                        {
+                            adjacent.Add(board[row, col - 1]);
+                        }
+                        if (row + 1 != game.MaxRow)
+                        {
+                            adjacent.Add(board[row + 1, col]);
+                        }
+                        if (row != 0)
+                        {
+                            adjacent.Add(board[row - 1, col]);
+                        }
+
+                        if (c == ' ')
+                        {
+                            continue;
+                        }
+
+                        // if current building is R
+                        else if (c == 'R')
+                        {
+                            if (adjacent.Contains('I'))
+                            {
+                                R.Add(1);
+                                RCount += 1;
+                            }
+                            else
+                            {
+                                pts = 0;
+                                RCount = 0;
+
+                                for (int i = 0; i < adjacent.Count; i++)
+                                {
+                                    if (adjacent[i] == 'R' || adjacent[i] == 'C')
+                                    {
+                                        pts += 1;
+                                        RCount += 1;
+                                    }
+                                    else if (adjacent[i] == 'P')
+                                    {
+                                        pts += 2;
+                                        RCount += 1;
+                                    }
+                                }
+                                R.Add(pts);
+                            }
+                        }
+
+                        // if current buidling is I
+                        else if (c == 'I')
+                        {
+                            ICount += 1;
+                            I.Add(1);
+                        }
+
+                        // if current building is C
+                        else if (c == 'C')
+                        {
+                            List<char> CAdjacent = new List<char>();
+                            for (int i = 0; i < adjacent.Count; i++)
+                            {
+                                if (adjacent[i] == 'C')
+                                {
+                                    CAdjacent.Add('C');
+                                    CCount += 1;
+                                }
+                            }
+                            C.Add(CAdjacent.Count);
+                        }
+
+                        // if current building is P
+                        else if (c == 'P')
+                        {
+                            List<char> PAdjacent = new List<char>();
+                            for (int i = 0; i < adjacent.Count; i++)
+                            {
+                                if (adjacent[i] == 'P')
+                                {
+                                    PAdjacent.Add('P');
+                                    PCount += 1;
+                                }
+                            }
+                            P.Add(PAdjacent.Count);
+                        }
+                    }
+                }
+
+                // R Points calculation
+                if (RCount == 0)
+                {
+                }
+                else if (RCount != 0)
+                {
+                    for (int i = 0; i < R.Count; i++)
+                    {
+                        RPts += R[i];
+                        total += RPts;
+                    }
+                }
+
+                // I Points calculation
+                if (ICount == 0)
+                {
+                }
+                else if (ICount != 0)
+                {
+                    for (int i = 0; i < I.Count; i++)
+                    {
+                        IPts += I[i];
+                        total += IPts;
+
+                    }
+                }
+
+                // C Points calculation
+                if (CCount == 0)
+                {
+                }
+                else if (CCount != 0)
+                {
+                    for (int i = 0; i < C.Count; i++)
+                    {
+                        CPts += C[i];
+                        total += CPts;
+                    }
+                }
+
+                // P Points calculation
+                if (PCount == 0)
+                {
+                }
+                else if (PCount != 0)
+                {
+                    for (int i = 0; i < P.Count; i++)
+                    {
+                        PPts += P[i];
+                        total += PPts;
+                    }
+                }
+
+                // * Points Calculation
+                if (HWYCount == 0)
+                {
+                }
+                else if (HWYCount != 0)
+                {
+                    for (int i = 0; i < HWY.Count; i++)
+                    {
+                        HWYPts += HWY[i];
+                        total += HWYPts;
+                    }
+                }
+
+                return total;
+
+
+            }
+
+        }
+
+            static int printCurrentScore(Game game)
+            {
             char[,] board = game.PlayerBoard;        
             int pts = 0;
             int total = 0;
@@ -681,7 +899,6 @@ namespace NgeeAnnCity
             // R Points calculation
             if (RCount == 0)
             {
-                Console.WriteLine('0');
             }
             else if (RCount != 0)
             {
@@ -695,7 +912,6 @@ namespace NgeeAnnCity
             // I Points calculation
             if (ICount == 0)
             {
-                Console.WriteLine('0');
             }
             else if (ICount != 0)
             {
@@ -710,7 +926,6 @@ namespace NgeeAnnCity
             // C Points calculation
             if (CCount == 0)
             {
-                Console.WriteLine('0');
             }
             else if (CCount != 0)
             {
@@ -724,7 +939,6 @@ namespace NgeeAnnCity
             // P Points calculation
             if (PCount == 0)
             {
-                Console.WriteLine("0");
             }
             else if (PCount != 0)
             {
@@ -738,7 +952,6 @@ namespace NgeeAnnCity
             // * Points Calculation
             if (HWYCount == 0)
             {
-                Console.WriteLine('0');
             }
             else if (HWYCount != 0)
             {
@@ -750,14 +963,14 @@ namespace NgeeAnnCity
             }
 
             // Display score for each building
-            Console.WriteLine("\nYour current points: " + "Residential (R) - " + RPts + " | " + "Industry (I) - " +
-                IPts + " | " + "Commercial (C) - " + CPts + " | " + "Park (P) - " + PPts + " | " + "Road (*) - " + HWYPts);
+            Console.WriteLine("\n   Your current points: " + "\n   Residential (R) - " + RPts + " \n   " + "Industry (I) - " +
+                IPts + " \n   " + "Commercial (C) - " + CPts + " \n   " + "Park (P) - " + PPts + " \n   " + "Road (*) - " + HWYPts);
             Console.WriteLine(" ");
 
             // Update overall Player Score
             game.PlayerScore = total;
 
-            Console.WriteLine(" Total Points: " + total);
+            Console.WriteLine("   Total Points: " + total + "\n");
             return total;             
         }
 
@@ -776,9 +989,9 @@ namespace NgeeAnnCity
 
         static void HelpInfo()
         {
-            
-            Console.WriteLine(" Building Scores: \n Industry (I) - Scores 1 point per industry in the city. Each industry generates 1 coin per residential building adjacent to it.");
-            Console.WriteLine(" Commercial (C): Scores 1 point per commercial adjacent to it. Each commercial generates 1 coin \n Residential (R): If it is next to an industry (I), then it scores 1 point only. Otherwise, it scores 1 point for each adjacent residential (R) or commercial (C), and 2 points for each adjacent park (O).\n Park (O): Scores 1 point per park adjacent to it. \n Road (*): Scores 1 point per connected road (*) in the same row.\n ");
+            Console.WriteLine("   This city-building game begins with 16 coins. \n   In each turn, the player will construct one of two randomly-selected buildings in the 20x20 city. \n   Each construction cost 1 coin. For the first building, the player can build anywhere in the city. \n   For subsequent constructions, the player can only build on squares that are connected to existing buildings. \n   The other building that was not built is discarded.");
+            Console.WriteLine("\n   Building Scores: \n   Industry (I) - Scores 1 point per industry in the city. \n   Each industry generates 1 coin per residential building adjacent to it.");
+            Console.WriteLine("   Commercial (C): Scores 1 point per commercial adjacent to it. Each commercial generates 1 coin \n   Residential (R): If it is next to an industry (I), then it scores 1 point only. \n   Otherwise, it scores 1 point for each adjacent residential (R) or commercial (C), and 2 points for each adjacent park (O).\n   Park (O): Scores 1 point per park adjacent to it. \n   Road (*): Scores 1 point per connected road (*) in the same row.\n ");
         }
 
         static void SaveGame(Game game)
@@ -794,7 +1007,7 @@ namespace NgeeAnnCity
 
         static void EndGame(Game game)
         {
-            Console.WriteLine(" You have finished your coins! \n This is your final board: \n Your final score: " + seeCurrentScore(game));
+            Console.WriteLine("   You have finished your coins! \n   This is your final board: \n   Your final score: " + printCurrentScore(game) + "\n\n");
             DisplayBoard(game.PlayerBoard, game);
         }
 
